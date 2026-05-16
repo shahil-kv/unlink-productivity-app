@@ -1,0 +1,32 @@
+name: Sync Figma Design Tokens
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "Commit message (optional)"
+        required: false
+        default: "chore: sync design tokens from Figma"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Sync tokens
+        env:
+          FIGMA_TOKEN: ${{ secrets.FIGMA_TOKEN }}
+        run: node scripts/sync-figma-tokens.js
+      - name: Commit if changed
+        run: |
+          git config user.name "Figma Sync Bot"
+          git config user.email "bot@figmasync.local"
+          git diff --quiet app/globals.css || (
+            git add app/globals.css &&
+            git commit -m "${{ github.event.inputs.message }}"
+          )
+      - uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
