@@ -199,7 +199,7 @@ export default function HomePage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => scrollTo("waitlist")}
-              className="hidden sm:inline-flex items-center gap-2 bg-[var(--brand-accent)] text-white text-sm font-medium px-4 py-2 rounded-full hover:bg-[#222] transition-colors duration-200"
+              className="hidden sm:inline-flex items-center gap-2 bg-[var(--brand-accent)] text-white text-sm font-medium px-4 py-2 rounded-full hover:bg-[#b91c1c] transition-colors duration-200"
               aria-label="Join the waitlist"
             >
               Join Waitlist <ArrowRight size={14} aria-hidden />
@@ -232,7 +232,7 @@ export default function HomePage() {
             ))}
             <button
               onClick={() => scrollTo("waitlist")}
-              className="bg-[var(--brand-accent)] text-white text-sm font-medium px-4 py-2 rounded-full mt-2 text-center"
+              className="bg-[var(--brand-accent)] text-white text-sm font-medium px-4 py-2 rounded-full mt-2 text-center hover:bg-[#b91c1c] transition-colors duration-200"
             >
               Join Waitlist
             </button>
@@ -265,7 +265,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => scrollTo("waitlist")}
-              className="inline-flex items-center justify-center gap-2 bg-[var(--brand-accent)] text-white font-medium px-7 py-3.5 rounded-full hover:bg-[#222] transition-colors duration-200 text-base"
+              className="inline-flex items-center justify-center gap-2 bg-[var(--brand-accent)] text-white font-medium px-7 py-3.5 rounded-full hover:bg-[#b91c1c] transition-colors duration-200 text-base"
             >
               Get Early Access <ArrowRight size={16} aria-hidden />
             </button>
