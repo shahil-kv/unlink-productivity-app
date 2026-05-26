@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Menu, X, Shield, Clock, Target, BarChart3, ArrowRight, Apple,
-  Star, Github, ChevronDown, ChevronUp, Zap, Lock, Eye, Database,
+  ChevronDown, ChevronUp, Zap, Lock, Eye, Database,
   Smartphone, Brain,
 } from "lucide-react";
 
@@ -80,7 +81,7 @@ const features: Feature[] = [
 const usps = [
   { icon: <Eye size={18} />, label: "Zero Login", sub: "No account required. Ever." },
   { icon: <Database size={18} />, label: "Zero Data Collection", sub: "Nothing leaves your phone." },
-  { icon: <Github size={18} />, label: "Open Source", sub: "Read every line of code." },
+  { icon: <GithubIcon size={18} />, label: "Open Source", sub: "Read every line of code." },
   { icon: <Smartphone size={18} />, label: "No Google Account", sub: "Works offline, always." },
   { icon: <Lock size={18} />, label: "On-Device Only", sub: "No cloud. No sync. No ads." },
   { icon: <Zap size={18} />, label: "Surgical, Not Blunt", sub: "Block Reels, not YouTube." },
@@ -246,6 +247,16 @@ function IntentGateMockup() {
   );
 }
 
+/* ─── GitHub Icon ─── */
+function GithubIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.03c3.18-.35 6.5-1.5 6.5-7.14a5.1 5.1 0 0 0-1.5-3.8 5.3 5.3 0 0 0-.15-3.8s-1.18-.38-3.9 1.4a13.2 13.2 0 0 0-7 0C5.18 2.5 4 2.88 4 2.88a5.3 5.3 0 0 0-.15 3.8A5.1 5.1 0 0 0 2 10.5c0 5.64 3.32 6.79 6.5 7.14a4.8 4.8 0 0 0-1 3.03V22" />
+      <path d="M9 20c-5 1.5-5-2.5-7-3" />
+    </svg>
+  );
+}
+
 /* ─── WhatsApp Icon ─── */
 function WhatsAppIcon({ size = 20 }: { size?: number }) {
   return (
@@ -254,6 +265,7 @@ function WhatsAppIcon({ size = 20 }: { size?: number }) {
     </svg>
   );
 }
+
 
 /* ─── Page ─── */
 export default function HomePage() {
@@ -332,7 +344,7 @@ export default function HomePage() {
               className="hidden sm:inline-flex items-center gap-2 border border-[var(--brand-border)] text-[var(--brand-dark)] text-sm font-medium px-4 py-1.5 rounded-full hover:border-[var(--brand-dark)] transition-colors duration-200"
               aria-label="View source on GitHub"
             >
-              <Github size={14} aria-hidden /> GitHub
+              <GithubIcon size={14} aria-hidden /> GitHub
             </a>
             <button
               onClick={() => scrollTo("waitlist")}
@@ -360,7 +372,7 @@ export default function HomePage() {
               </button>
             ))}
             <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[#444]">
-              <Github size={14} /> View Source on GitHub
+              <GithubIcon size={14} /> View Source on GitHub
             </a>
             <button onClick={() => scrollTo("waitlist")} className="bg-[var(--brand-accent)] text-white text-sm font-medium px-4 py-2 rounded-full mt-2 text-center hover:bg-[#b91c1c] transition-colors duration-200">
               Get Early Access
@@ -370,7 +382,7 @@ export default function HomePage() {
       </header>
 
       {/* HERO */}
-      <section className="min-h-screen flex flex-col items-center justify-center pt-14 px-5 text-center" aria-labelledby="hero-heading">
+      <section className="min-h-screen flex flex-col items-center justify-center pt-28 pb-20 px-5 text-center" aria-labelledby="hero-heading">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs uppercase tracking-[0.2em] text-[#888] mb-6 font-medium">
             Android · Open Source · Zero Login · No Cloud
@@ -380,12 +392,12 @@ export default function HomePage() {
             className="text-5xl sm:text-6xl md:text-8xl font-bold leading-[0.95] tracking-tight text-[var(--brand-dark)] mb-8"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Block Reels.{" "}
-            <span className="block">Not YouTube.</span>
+            Block Instagram Reels.{" "}
+            <span className="block">Not Instagram.</span>
             <span className="block text-[#aaa]">Finally.</span>
           </h1>
           <p className="text-lg md:text-xl text-[#555] max-w-xl mx-auto mb-10 leading-relaxed">
-            Unlink surgically blocks YouTube Shorts and Instagram Reels without touching the rest of the app.
+            Unlink surgically blocks Instagram Reels and YouTube Shorts — without touching DMs, search, or the rest of the app.
             No login. No cloud. Open source. Built for Android.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -401,13 +413,20 @@ export default function HomePage() {
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 border border-[var(--brand-border)] text-[var(--brand-dark)] font-medium px-7 py-3.5 rounded-full hover:border-[var(--brand-dark)] transition-colors duration-200 text-base"
             >
-              <Github size={16} aria-hidden /> View Source Code
+              <GithubIcon size={16} aria-hidden /> View Source Code
             </a>
           </div>
         </div>
 
-        <div className="mt-16 w-full max-w-sm mx-auto">
-          <BlockingMockup />
+        <div className="mt-16 w-full max-w-xs mx-auto">
+          <Image
+            src="/seeyourcount.png"
+            alt="Unlink showing live Instagram Reels scroll counter"
+            width={360}
+            height={640}
+            className="rounded-3xl shadow-[0_32px_80px_rgba(0,0,0,0.25)] w-full h-auto"
+            priority
+          />
         </div>
       </section>
 
@@ -538,8 +557,26 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-col md:flex-row gap-8 items-center justify-center">
-            <BlockingMockup />
-            <IntentGateMockup />
+            <div className="w-full max-w-[280px] mx-auto">
+              <p className="text-xs uppercase tracking-widest text-[#888] text-center mb-3">Home — Usage Stats</p>
+              <Image
+                src="/home.jpg"
+                alt="Unlink app home screen showing daily usage stats"
+                width={320}
+                height={580}
+                className="rounded-3xl shadow-2xl w-full h-auto"
+              />
+            </div>
+            <div className="w-full max-w-[280px] mx-auto">
+              <p className="text-xs uppercase tracking-widest text-[#888] text-center mb-3">Streaks — Session History</p>
+              <Image
+                src="/second.jpg"
+                alt="Unlink streaks and session history screen"
+                width={320}
+                height={580}
+                className="rounded-3xl shadow-2xl w-full h-auto"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -551,10 +588,10 @@ export default function HomePage() {
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-[#555] mb-4">Transparent by design</p>
               <h2 id="oss-heading" className="text-3xl md:text-4xl font-bold leading-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
-                Read the code.<br />Trust the code.
+                The entire source<br />code is public.
               </h2>
               <p className="text-[#888] text-base leading-relaxed max-w-md mb-6">
-                Unlink is fully open source. Every line the Accessibility Service runs is public. No hidden data collection. No trackers. No ads. You do not have to take our word for it.
+                Every line the Accessibility Service runs is on GitHub. See exactly what is read, what is blocked, and what never leaves your device. No claims — just code.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
@@ -563,7 +600,7 @@ export default function HomePage() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-white text-[var(--brand-dark)] font-semibold px-6 py-3 rounded-full hover:bg-[#ddd] transition-colors text-sm"
                 >
-                  <Github size={16} aria-hidden /> View on GitHub
+                  <GithubIcon size={16} aria-hidden /> View on GitHub
                 </a>
                 <a
                   href={WHATSAPP_GROUP_URL}
@@ -740,6 +777,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* TUTORIAL */}
+      <section className="py-20 px-5 border-b border-[var(--brand-border)]" aria-labelledby="tutorial-heading">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-[#888] mb-4">Setup guide</p>
+          <h2
+            id="tutorial-heading"
+            className="text-3xl md:text-4xl font-bold text-[var(--brand-dark)] leading-tight mb-4"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            How to block Instagram Reels in 2 minutes.
+          </h2>
+          <p className="text-[#555] text-base leading-relaxed mb-8 max-w-xl mx-auto">
+            A full video tutorial showing exactly how to install Unlink, grant permissions, and set up surgical Instagram Reel blocking will be uploaded soon.
+          </p>
+          <div className="border border-[var(--brand-border)] rounded-2xl p-8 bg-[var(--brand-secondary)] inline-flex flex-col sm:flex-row items-center gap-4 w-full max-w-md mx-auto">
+            <div className="w-12 h-12 rounded-xl bg-[var(--brand-dark)] flex items-center justify-center flex-shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden>
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-[var(--brand-dark)] text-sm" style={{ fontFamily: "var(--font-display)" }}>Tutorial dropping soon</p>
+              <p className="text-[#888] text-xs mt-0.5">Join the WhatsApp group to get notified first.</p>
+            </div>
+            <a
+              href={WHATSAPP_GROUP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sm:ml-auto bg-[#25d366] text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-[#1dba57] transition-colors flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
+            >
+              <WhatsAppIcon size={13} /> Join Group
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer className="bg-[var(--brand-dark)] border-t border-[#111] py-12 px-5" role="contentinfo">
         <div className="max-w-5xl mx-auto">
@@ -751,7 +824,7 @@ export default function HomePage() {
               </p>
               <div className="flex gap-3 items-center">
                 <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="text-[#444] hover:text-white transition-colors" aria-label="GitHub">
-                  <Github size={18} />
+                  <GithubIcon size={18} />
                 </a>
                 <a href={WHATSAPP_GROUP_URL} target="_blank" rel="noopener noreferrer" className="text-[#444] hover:text-[#25d366] transition-colors" aria-label="WhatsApp Community">
                   <WhatsAppIcon size={18} />
@@ -780,7 +853,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-[#1a1a1a] pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <p className="text-[#444] text-xs">© 2025 Unlink. Built by Shahil KV.</p>
+            <p className="text-[#444] text-xs">© {new Date().getFullYear()} Unlink. Built by Shahil KV.</p>
             <p className="text-[#333] text-xs">Your attention is yours. Reclaim it.</p>
           </div>
         </div>
