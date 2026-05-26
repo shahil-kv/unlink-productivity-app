@@ -1,29 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Menu, X, Shield, Clock, Scroll, Target, BarChart3, ArrowRight, Apple, Star } from "lucide-react";
+import Link from "next/link";
+import {
+  Menu, X, Shield, Clock, Target, BarChart3, ArrowRight, Apple,
+  Star, Github, ChevronDown, ChevronUp, Zap, Lock, Eye, Database,
+  Smartphone, Brain,
+} from "lucide-react";
+
+const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/CSbgILhOWCOIAL8ld31HLS?mode=gi_t";
+const GITHUB_URL = "https://github.com/UnlinkHq/Application";
 
 /* ─── Types ─── */
-interface StatItem {
-  value: number;
-  suffix: string;
-  label: string;
-}
+interface StatItem { value: number; suffix: string; label: string }
+interface Feature { icon: React.ReactNode; title: string; description: string; badge?: string }
+interface FAQ { q: string; a: string }
 
-interface Feature {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-interface Testimonial {
-  avatar: string;
-  name: string;
-  role: string;
-  quote: string;
-}
-
-/* ─── Data ─── */
+/* ─── Data (real, from the actual app) ─── */
 const stats: StatItem[] = [
   { value: 4, suffix: "h 37m", label: "Average daily screen time" },
   { value: 2617, suffix: "×", label: "Phone checks per day" },
@@ -32,80 +25,114 @@ const stats: StatItem[] = [
 
 const features: Feature[] = [
   {
-    icon: <Shield size={22} aria-hidden />,
-    title: "App Blocking",
+    icon: <Zap size={22} aria-hidden />,
+    title: "Surgical Mode",
     description:
-      "Lock any app for a set period. Instagram, TikTok, Reddit — gone until you decide otherwise. No workarounds.",
+      "Blocks only YouTube Shorts and Instagram Reels — not the whole app. DMs, subscriptions, long videos still work. You kill the addiction loop, not your life.",
+    badge: "Unique",
   },
   {
-    icon: <Clock size={22} aria-hidden />,
-    title: "Daily Limits",
+    icon: <Brain size={22} aria-hidden />,
+    title: "Intent Gate",
     description:
-      "Set hard daily limits per app or per category. When time is up, Unlink cuts access. No snooze button.",
-  },
-  {
-    icon: <Scroll size={22} aria-hidden />,
-    title: "Scroll Lock",
-    description:
-      "Detects infinite-scroll sessions and freezes them after your threshold. Break the doomscroll reflex.",
-  },
-  {
-    icon: <Target size={22} aria-hidden />,
-    title: "Focus Sessions",
-    description:
-      "Deep work mode blocks everything except what you allow. Phone becomes a tool, not a distraction.",
+      "Before Unlink lets you open YouTube or Instagram, it asks why. That one question breaks the reflex. You either have a reason or you close the app. Either way you win.",
+    badge: "Unique",
   },
   {
     icon: <BarChart3 size={22} aria-hidden />,
-    title: "Habit Reports",
+    title: "Brainrot Score",
     description:
-      "Weekly brutally-honest reports of where your time actually went. Data that makes you uncomfortable — on purpose.",
+      "A live 0–100 score that climbs every time you scroll Reels or Shorts and heals when you stop. Watching it go up is uncomfortable. That is the point.",
   },
   {
     icon: <Shield size={22} aria-hidden />,
-    title: "Tamper-Proof",
+    title: "Full App Blocking",
     description:
-      "Unlink cannot be deleted or paused without a cool-down period. Designed to outlast your weakest moment.",
+      "Lock any app completely during a session — Instagram, Reddit, X, YouTube, whatever you pick. No workarounds. No snooze button.",
+  },
+  {
+    icon: <Clock size={22} aria-hidden />,
+    title: "Focus Schedules",
+    description:
+      "Set recurring block windows — Mon–Fri 9am–5pm, every night after 10pm, whenever. Runs automatically whether or not you open Unlink.",
+  },
+  {
+    icon: <Lock size={22} aria-hidden />,
+    title: "Mom Test",
+    description:
+      "Add a trusted contact. When you try to break a committed session early, only they get the unlock code. No willpower needed — accountability is built in.",
+  },
+  {
+    icon: <Target size={22} aria-hidden />,
+    title: "Strict Mode",
+    description:
+      "Once on, Unlink cannot be force-stopped, uninstalled, or paused without your session ending first. Built for the version of you that lies to yourself.",
+  },
+  {
+    icon: <Database size={22} aria-hidden />,
+    title: "Zero Login. Zero Cloud.",
+    description:
+      "No account. No Google sign-in. No server. Your block list, session history, and brainrot score live entirely on your device. Always.",
+    badge: "Open Source",
   },
 ];
 
-const testimonials: Testimonial[] = [
+const usps = [
+  { icon: <Eye size={18} />, label: "Zero Login", sub: "No account required. Ever." },
+  { icon: <Database size={18} />, label: "Zero Data Collection", sub: "Nothing leaves your phone." },
+  { icon: <Github size={18} />, label: "Open Source", sub: "Read every line of code." },
+  { icon: <Smartphone size={18} />, label: "No Google Account", sub: "Works offline, always." },
+  { icon: <Lock size={18} />, label: "On-Device Only", sub: "No cloud. No sync. No ads." },
+  { icon: <Zap size={18} />, label: "Surgical, Not Blunt", sub: "Block Reels, not YouTube." },
+];
+
+const faqs: FAQ[] = [
   {
-    avatar: "https://i.pravatar.cc/48?img=11",
-    name: "Priya S.",
-    role: "Product Designer, Mumbai",
-    quote:
-      "I was at 7 hours a day. Unlink showed me the number and I felt sick. Three weeks later I am at 2. Nothing else worked.",
+    q: "Does Unlink require a Google account or any login?",
+    a: "No. Zero login, zero signup, zero cloud account. Everything — your block list, session history, brainrot score — stays on your device. There is no server that knows you exist.",
   },
   {
-    avatar: "https://i.pravatar.cc/48?img=32",
-    name: "Marcus T.",
-    role: "Software Engineer, Berlin",
-    quote:
-      "I deleted every other screen-time app because I kept bypassing them. Unlink's tamper-proof mode is genuinely the first thing that has stuck.",
+    q: "Can I bypass Unlink once a session has started?",
+    a: "In Strict Mode with Mom Test enabled, only your trusted contact can provide the unlock code. Without it, the session runs until it ends naturally. In normal mode you can turn it off from Settings at any time.",
   },
   {
-    avatar: "https://i.pravatar.cc/48?img=47",
-    name: "Leila K.",
-    role: "Graduate Student, Toronto",
-    quote:
-      "The scroll lock feature alone changed my life. I did not realize how many hours I was losing to a reflex. Now I notice when it happens.",
+    q: "Does it block the whole app or just Reels and Shorts?",
+    a: "Both modes exist. Surgical Mode blocks only YouTube Shorts and Instagram Reels — you can still use DMs, long videos, and subscriptions. Full blocking locks the entire app for the duration of your session.",
+  },
+  {
+    q: "Will Unlink break my banking app?",
+    a: "Some banking apps detect any active Accessibility Service and show a security warning. If yours does, temporarily disable Unlink's accessibility service in Android Settings → Accessibility → Unlink Focus Guard → Off, do your banking, then re-enable it. This is a known limitation of all accessibility-based screen time apps.",
+  },
+  {
+    q: "Is Unlink really open source?",
+    a: "Yes. Full source code is on GitHub at github.com/UnlinkHq/Application. You can read exactly what the accessibility service does, verify no data is collected, and contribute if you want.",
+  },
+  {
+    q: "What is the Brainrot Score?",
+    a: "A 0–100 daily engagement metric that goes up every time you scroll through Reels or Shorts and slowly heals when you stop. It resets at midnight. It is deliberately uncomfortable to watch rise — that discomfort is the feature.",
+  },
+  {
+    q: "Does blocking survive a phone reboot?",
+    a: "Yes. Active sessions and schedules survive reboots by design. If you reboot to escape a session, Unlink picks up exactly where it left off.",
+  },
+  {
+    q: "What is the Intent Gate?",
+    a: "When Surgical Mode is on, Unlink intercepts your tap on YouTube or Instagram and asks: 'Why are you opening this?' You choose an answer — DMs only, long videos, specific reason. The act of answering breaks the mindless reflex. If you have no reason, you close the app.",
   },
 ];
 
 const marqueeItems = [
-  "Block apps", "Kill the scroll", "Reclaim your time", "Hard limits",
-  "No workarounds", "Tamper-proof", "Real data", "Fewer regrets",
-  "Block apps", "Kill the scroll", "Reclaim your time", "Hard limits",
-  "No workarounds", "Tamper-proof", "Real data", "Fewer regrets",
+  "Surgical Reels Blocking", "Intent Gate", "Brainrot Score", "Zero Login",
+  "Open Source", "Mom Test", "Focus Schedules", "Strict Mode", "Zero Data", "On-Device",
+  "Surgical Reels Blocking", "Intent Gate", "Brainrot Score", "Zero Login",
+  "Open Source", "Mom Test", "Focus Schedules", "Strict Mode", "Zero Data", "On-Device",
 ];
 
-const navLinks = ["Features", "How It Works", "Testimonials"];
+const navLinks = ["Features", "How It Works", "FAQ", "Open Source"];
 
 /* ─── Animated counter ─── */
 function AnimatedStat({ value, suffix, label, active }: StatItem & { active: boolean }) {
   const [displayed, setDisplayed] = useState(0);
-
   useEffect(() => {
     if (!active) return;
     let start = 0;
@@ -114,12 +141,8 @@ function AnimatedStat({ value, suffix, label, active }: StatItem & { active: boo
     const increment = value / (duration / step);
     const timer = setInterval(() => {
       start += increment;
-      if (start >= value) {
-        setDisplayed(value);
-        clearInterval(timer);
-      } else {
-        setDisplayed(Math.floor(start));
-      }
+      if (start >= value) { setDisplayed(value); clearInterval(timer); }
+      else setDisplayed(Math.floor(start));
     }, step);
     return () => clearInterval(timer);
   }, [active, value]);
@@ -131,11 +154,104 @@ function AnimatedStat({ value, suffix, label, active }: StatItem & { active: boo
         style={{ fontFamily: "var(--font-display)" }}
         aria-label={`${value}${suffix}`}
       >
-        {displayed}
-        <span className="text-2xl md:text-3xl">{suffix}</span>
+        {displayed}<span className="text-2xl md:text-3xl">{suffix}</span>
       </div>
       <p className="text-sm text-[#666] uppercase tracking-widest">{label}</p>
     </div>
+  );
+}
+
+/* ─── FAQ Item ─── */
+function FAQItem({ q, a }: FAQ) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-[var(--brand-border)]">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full text-left py-5 flex items-start justify-between gap-4 group cursor-pointer"
+        aria-expanded={open}
+      >
+        <span
+          className="text-base font-semibold text-[var(--brand-dark)] group-hover:text-[var(--brand-accent)] transition-colors"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          {q}
+        </span>
+        {open
+          ? <ChevronUp size={18} className="flex-shrink-0 text-[#888] mt-0.5" aria-hidden />
+          : <ChevronDown size={18} className="flex-shrink-0 text-[#888] mt-0.5" aria-hidden />
+        }
+      </button>
+      {open && (
+        <p className="pb-5 text-sm text-[#555] leading-relaxed">{a}</p>
+      )}
+    </div>
+  );
+}
+
+/* ─── Blocking UI Mockup ─── */
+function BlockingMockup() {
+  return (
+    <div className="w-full max-w-xs mx-auto">
+      <div className="bg-[#0a0a0a] rounded-3xl p-6 border border-[#222] shadow-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <span className="text-[#444] text-xs uppercase tracking-widest">Unlink Focus Active</span>
+          <div className="flex gap-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#dc2626]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#dc2626] opacity-60" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#dc2626] opacity-30" />
+          </div>
+        </div>
+        <div className="mb-4 text-center">
+          <div className="text-4xl mb-2">🧠</div>
+          <p className="text-[#666] text-xs uppercase tracking-widest">Brain at</p>
+          <p className="text-white text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>47% Rot</p>
+        </div>
+        <div className="bg-[#111] rounded-xl p-4 mb-4 border border-[#1a1a1a]">
+          <p className="text-[#555] text-xs uppercase tracking-widest mb-1">Blocked</p>
+          <p className="text-white text-sm font-semibold">Instagram</p>
+          <p className="text-[#444] text-xs mt-1">Session ends in 2h 14m</p>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex-1 bg-white rounded-xl py-2.5 text-center">
+            <span className="text-black text-xs font-bold uppercase tracking-wide">Go Home</span>
+          </div>
+          <div className="flex-1 border border-[#222] rounded-xl py-2.5 text-center">
+            <span className="text-[#555] text-xs uppercase tracking-wide">Break (2 left)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Intent Gate Mockup ─── */
+function IntentGateMockup() {
+  return (
+    <div className="w-full max-w-xs mx-auto">
+      <div className="bg-[#0a0a0a] rounded-3xl p-6 border border-[#222] shadow-2xl">
+        <p className="text-[#666] text-xs uppercase tracking-widest mb-1 text-center">Intent Gate</p>
+        <h3 className="text-white text-lg font-bold text-center mb-6" style={{ fontFamily: "var(--font-display)" }}>
+          Why are you opening<br />YouTube today?
+        </h3>
+        <div className="space-y-2">
+          {["DMs only", "Long videos", "Specific reason", "Full focus — don't open"].map((opt) => (
+            <div key={opt} className="border border-[#1a1a1a] rounded-xl px-4 py-3 hover:border-[#333] transition-colors cursor-pointer">
+              <span className="text-[#888] text-xs">{opt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── WhatsApp Icon ─── */
+function WhatsAppIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
   );
 }
 
@@ -144,6 +260,8 @@ export default function HomePage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [emailLoading, setEmailLoading] = useState(false);
   const [email, setEmail] = useState("");
   const statsRef = useRef<HTMLDivElement>(null);
 
@@ -156,9 +274,27 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-  function handleEmailSubmit(e: React.FormEvent) {
+  async function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (email.trim()) setEmailSubmitted(true);
+    if (!email.trim()) return;
+    setEmailLoading(true);
+    setEmailError("");
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      if (res.ok) {
+        setEmailSubmitted(true);
+      } else {
+        setEmailError("Something went wrong. Try again.");
+      }
+    } catch {
+      setEmailError("No connection. Try again.");
+    } finally {
+      setEmailLoading(false);
+    }
   }
 
   function scrollTo(id: string) {
@@ -170,17 +306,9 @@ export default function HomePage() {
     <div className="bg-[var(--brand-bg)] text-[var(--brand-dark)] min-h-screen">
 
       {/* NAV */}
-      <header
-        className="fixed top-0 left-0 right-0 z-50 bg-[var(--brand-bg)] border-b border-[var(--brand-border)]"
-        role="banner"
-      >
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--brand-bg)] border-b border-[var(--brand-border)]" role="banner">
         <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
-          <a
-            href="#"
-            className="text-xl font-bold tracking-tight text-[var(--brand-dark)]"
-            style={{ fontFamily: "var(--font-display)" }}
-            aria-label="Unlink home"
-          >
+          <a href="#" className="text-xl font-bold tracking-tight text-[var(--brand-dark)]" style={{ fontFamily: "var(--font-display)" }} aria-label="Unlink home">
             Unlink
           </a>
 
@@ -197,12 +325,21 @@ export default function HomePage() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-2 border border-[var(--brand-border)] text-[var(--brand-dark)] text-sm font-medium px-4 py-1.5 rounded-full hover:border-[var(--brand-dark)] transition-colors duration-200"
+              aria-label="View source on GitHub"
+            >
+              <Github size={14} aria-hidden /> GitHub
+            </a>
             <button
               onClick={() => scrollTo("waitlist")}
               className="hidden sm:inline-flex items-center gap-2 bg-[var(--brand-accent)] text-white text-sm font-medium px-4 py-2 rounded-full hover:bg-[#b91c1c] transition-colors duration-200"
               aria-label="Join the waitlist"
             >
-              Join Waitlist <ArrowRight size={14} aria-hidden />
+              Get Early Access <ArrowRight size={14} aria-hidden />
             </button>
             <button
               className="md:hidden text-[var(--brand-dark)] p-1"
@@ -216,51 +353,40 @@ export default function HomePage() {
         </div>
 
         {mobileOpen && (
-          <div
-            className="md:hidden bg-[var(--brand-bg)] border-t border-[var(--brand-border)] px-5 py-4 flex flex-col gap-4"
-            role="navigation"
-            aria-label="Mobile navigation"
-          >
+          <div className="md:hidden bg-[var(--brand-bg)] border-t border-[var(--brand-border)] px-5 py-4 flex flex-col gap-4" role="navigation" aria-label="Mobile navigation">
             {navLinks.map((link) => (
-              <button
-                key={link}
-                onClick={() => scrollTo(link.toLowerCase().replace(/\s+/g, "-"))}
-                className="text-left text-sm text-[#444] hover:text-[var(--brand-dark)] transition-colors"
-              >
+              <button key={link} onClick={() => scrollTo(link.toLowerCase().replace(/\s+/g, "-"))} className="text-left text-sm text-[#444] hover:text-[var(--brand-dark)] transition-colors">
                 {link}
               </button>
             ))}
-            <button
-              onClick={() => scrollTo("waitlist")}
-              className="bg-[var(--brand-accent)] text-white text-sm font-medium px-4 py-2 rounded-full mt-2 text-center hover:bg-[#b91c1c] transition-colors duration-200"
-            >
-              Join Waitlist
+            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[#444]">
+              <Github size={14} /> View Source on GitHub
+            </a>
+            <button onClick={() => scrollTo("waitlist")} className="bg-[var(--brand-accent)] text-white text-sm font-medium px-4 py-2 rounded-full mt-2 text-center hover:bg-[#b91c1c] transition-colors duration-200">
+              Get Early Access
             </button>
           </div>
         )}
       </header>
 
       {/* HERO */}
-      <section
-        className="min-h-screen flex flex-col items-center justify-center pt-14 px-5 text-center"
-        aria-labelledby="hero-heading"
-      >
+      <section className="min-h-screen flex flex-col items-center justify-center pt-14 px-5 text-center" aria-labelledby="hero-heading">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs uppercase tracking-[0.2em] text-[#888] mb-6 font-medium">
-            Digital wellness · App blocking · Habit repair
+            Android · Open Source · Zero Login · No Cloud
           </p>
           <h1
             id="hero-heading"
             className="text-5xl sm:text-6xl md:text-8xl font-bold leading-[0.95] tracking-tight text-[var(--brand-dark)] mb-8"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            You will check your phone{" "}
-            <span className="block">2,617 times</span>
-            <span className="block text-[#aaa]">today.</span>
+            Block Reels.{" "}
+            <span className="block">Not YouTube.</span>
+            <span className="block text-[#aaa]">Finally.</span>
           </h1>
           <p className="text-lg md:text-xl text-[#555] max-w-xl mx-auto mb-10 leading-relaxed">
-            Unlink blocks the apps that trap you, enforces limits you cannot wriggle out of,
-            and kills the scroll reflex so you can get your attention back.
+            Unlink surgically blocks YouTube Shorts and Instagram Reels without touching the rest of the app.
+            No login. No cloud. Open source. Built for Android.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
@@ -269,32 +395,24 @@ export default function HomePage() {
             >
               Get Early Access <ArrowRight size={16} aria-hidden />
             </button>
-            <button
-              onClick={() => scrollTo("how-it-works")}
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 border border-[var(--brand-border)] text-[var(--brand-dark)] font-medium px-7 py-3.5 rounded-full hover:border-[var(--brand-dark)] transition-colors duration-200 text-base"
             >
-              See How It Works
-            </button>
+              <Github size={16} aria-hidden /> View Source Code
+            </a>
           </div>
         </div>
 
-        <div className="mt-16 w-full max-w-2xl mx-auto relative">
-          <div className="w-full aspect-video bg-[var(--brand-secondary)] rounded-2xl overflow-hidden border border-[var(--brand-border)]">
-            <img
-              src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&q=80"
-              alt="Person setting down phone to focus"
-              className="w-full h-full object-cover opacity-80"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--brand-bg)] via-transparent to-transparent rounded-2xl" />
-          </div>
+        <div className="mt-16 w-full max-w-sm mx-auto">
+          <BlockingMockup />
         </div>
       </section>
 
       {/* MARQUEE */}
-      <div
-        className="overflow-hidden border-y border-[var(--brand-border)] py-3 bg-[var(--brand-secondary)]"
-        aria-hidden="true"
-      >
+      <div className="overflow-hidden border-y border-[var(--brand-border)] py-3 bg-[var(--brand-secondary)]" aria-hidden="true">
         <div className="flex gap-10 whitespace-nowrap animate-marquee">
           {marqueeItems.map((item, i) => (
             <span key={i} className="text-sm uppercase tracking-widest text-[#555] font-medium flex-shrink-0">
@@ -305,70 +423,59 @@ export default function HomePage() {
       </div>
 
       {/* STATS */}
-      <section
-        ref={statsRef}
-        className="py-16 border-b border-[var(--brand-border)]"
-        aria-label="Screen time statistics"
-      >
+      <section ref={statsRef} className="py-16 border-b border-[var(--brand-border)]" aria-label="Screen time statistics">
         <div className="max-w-5xl mx-auto px-5">
-          <p className="text-center text-xs uppercase tracking-[0.2em] text-[#888] mb-10">
-            The numbers you have been avoiding
-          </p>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-[#888] mb-10">The numbers you have been avoiding</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 divide-[var(--brand-border)] border border-[var(--brand-border)] rounded-xl overflow-hidden">
-            {stats.map((stat) => (
-              <AnimatedStat key={stat.label} {...stat} active={statsVisible} />
+            {stats.map((stat) => <AnimatedStat key={stat.label} {...stat} active={statsVisible} />)}
+          </div>
+          <p className="text-center text-xs text-[#999] mt-4">Source: RescueTime Global Report · IDC Research · Dscout</p>
+        </div>
+      </section>
+
+      {/* USP BADGES */}
+      <section className="py-20 px-5 border-b border-[var(--brand-border)]" aria-labelledby="usp-heading">
+        <div className="max-w-5xl mx-auto">
+          <div className="max-w-xl mb-12">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#888] mb-4">Why Unlink is different</p>
+            <h2 id="usp-heading" className="text-4xl md:text-5xl font-bold text-[var(--brand-dark)] leading-tight" style={{ fontFamily: "var(--font-display)" }}>
+              No login. No cloud.{" "}
+              <span className="text-[#aaa]">No bullshit.</span>
+            </h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {usps.map((u) => (
+              <div key={u.label} className="flex items-start gap-4 border border-[var(--brand-border)] rounded-xl p-5 bg-[var(--brand-surface)]">
+                <div className="w-9 h-9 rounded-lg bg-[var(--brand-dark)] text-white flex items-center justify-center flex-shrink-0">
+                  {u.icon}
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-[var(--brand-dark)] mb-0.5" style={{ fontFamily: "var(--font-display)" }}>{u.label}</p>
+                  <p className="text-xs text-[#888]">{u.sub}</p>
+                </div>
+              </div>
             ))}
           </div>
-          <p className="text-center text-xs text-[#999] mt-4">
-            Source: RescueTime Global Report · IDC Research · Dscout
-          </p>
         </div>
       </section>
 
       {/* PROBLEM */}
-      <section
-        className="bg-[var(--brand-dark)] text-white py-24 px-5"
-        aria-labelledby="problem-heading"
-      >
+      <section className="bg-[var(--brand-dark)] text-white py-24 px-5" aria-labelledby="problem-heading">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs uppercase tracking-[0.2em] text-[#666] mb-6">The real cost</p>
-          <h2
-            id="problem-heading"
-            className="text-4xl md:text-6xl font-bold leading-tight mb-10"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
+          <h2 id="problem-heading" className="text-4xl md:text-6xl font-bold leading-tight mb-10" style={{ fontFamily: "var(--font-display)" }}>
             Your phone is not the problem.
             <span className="block text-[#666] mt-2">Your habits are.</span>
           </h2>
           <div className="grid md:grid-cols-2 gap-8 mt-12">
             {[
-              {
-                label: "Fragmented focus",
-                body: "The average person takes 23 minutes to regain focus after a single phone check. You check hundreds of times a day.",
-              },
-              {
-                label: "Sleep erosion",
-                body: "Blue light and anxiety loops from late-night scrolling steal 1 to 2 hours of sleep quality every night.",
-              },
-              {
-                label: "Attention sold",
-                body: "Every scroll is a vote. Social apps are engineered by teams of PhDs to keep you locked in. You are not fighting a bad habit — you are fighting a billion-dollar machine.",
-              },
-              {
-                label: "Memory gaps",
-                body: "Constant distraction impairs long-term memory consolidation. You consume more and retain less every year.",
-              },
+              { label: "Fragmented focus", body: "The average person takes 23 minutes to regain focus after a single phone check. You check hundreds of times a day." },
+              { label: "Sleep erosion", body: "Blue light and anxiety loops from late-night scrolling steal 1 to 2 hours of sleep quality every night." },
+              { label: "Attention sold", body: "Every scroll is a vote. Social apps are engineered by teams of PhDs to keep you locked in. You are not fighting a bad habit — you are fighting a billion-dollar machine." },
+              { label: "Memory gaps", body: "Constant distraction impairs long-term memory consolidation. You consume more and retain less every year." },
             ].map((item) => (
-              <div
-                key={item.label}
-                className="border border-[#222] rounded-xl p-6 hover:border-[#444] transition-colors duration-200"
-              >
-                <h3
-                  className="text-lg font-semibold mb-2 text-white"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  {item.label}
-                </h3>
+              <div key={item.label} className="border border-[#222] rounded-xl p-6 hover:border-[#444] transition-colors duration-200">
+                <h3 className="text-lg font-semibold mb-2 text-white" style={{ fontFamily: "var(--font-display)" }}>{item.label}</h3>
                 <p className="text-[#888] text-sm leading-relaxed">{item.body}</p>
               </div>
             ))}
@@ -377,41 +484,28 @@ export default function HomePage() {
       </section>
 
       {/* FEATURES */}
-      <section
-        id="features"
-        className="py-24 px-5 border-b border-[var(--brand-border)]"
-        aria-labelledby="features-heading"
-      >
+      <section id="features" className="py-24 px-5 border-b border-[var(--brand-border)]" aria-labelledby="features-heading">
         <div className="max-w-5xl mx-auto">
           <div className="max-w-xl mb-14">
             <p className="text-xs uppercase tracking-[0.2em] text-[#888] mb-4">What Unlink does</p>
-            <h2
-              id="features-heading"
-              className="text-4xl md:text-5xl font-bold text-[var(--brand-dark)] leading-tight"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
+            <h2 id="features-heading" className="text-4xl md:text-5xl font-bold text-[var(--brand-dark)] leading-tight" style={{ fontFamily: "var(--font-display)" }}>
               Built for the weakest version of you.
             </h2>
-            <p className="mt-4 text-[#555] text-base leading-relaxed">
-              Willpower is finite. Unlink works when yours runs out.
-            </p>
+            <p className="mt-4 text-[#555] text-base leading-relaxed">Willpower is finite. Unlink works when yours runs out.</p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {features.map((f) => (
-              <div
-                key={f.title}
-                className="border border-[var(--brand-border)] rounded-xl p-6 bg-[var(--brand-surface)] hover:border-[var(--brand-dark)] transition-colors duration-200 group"
-              >
+              <div key={f.title} className="border border-[var(--brand-border)] rounded-xl p-6 bg-[var(--brand-surface)] hover:border-[var(--brand-dark)] transition-colors duration-200 group relative">
+                {f.badge && (
+                  <span className="absolute top-4 right-4 text-[9px] uppercase tracking-widest bg-[var(--brand-dark)] text-white px-2 py-0.5 rounded-full">
+                    {f.badge}
+                  </span>
+                )}
                 <div className="w-10 h-10 rounded-lg bg-[var(--brand-secondary)] flex items-center justify-center mb-4 group-hover:bg-[var(--brand-dark)] group-hover:text-white transition-colors duration-200">
                   {f.icon}
                 </div>
-                <h3
-                  className="font-semibold text-[var(--brand-dark)] mb-2"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  {f.title}
-                </h3>
+                <h3 className="font-semibold text-[var(--brand-dark)] mb-2" style={{ fontFamily: "var(--font-display)" }}>{f.title}</h3>
                 <p className="text-sm text-[#666] leading-relaxed">{f.description}</p>
               </div>
             ))}
@@ -420,193 +514,225 @@ export default function HomePage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section
-        id="how-it-works"
-        className="py-24 px-5 bg-[var(--brand-secondary)] border-b border-[var(--brand-border)]"
-        aria-labelledby="how-heading"
-      >
+      <section id="how-it-works" className="py-24 px-5 bg-[var(--brand-secondary)] border-b border-[var(--brand-border)]" aria-labelledby="how-heading">
         <div className="max-w-5xl mx-auto">
           <div className="max-w-xl mb-14">
             <p className="text-xs uppercase tracking-[0.2em] text-[#888] mb-4">How it works</p>
-            <h2
-              id="how-heading"
-              className="text-4xl md:text-5xl font-bold text-[var(--brand-dark)] leading-tight"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
+            <h2 id="how-heading" className="text-4xl md:text-5xl font-bold text-[var(--brand-dark)] leading-tight" style={{ fontFamily: "var(--font-display)" }}>
               Three steps. No complexity.
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
             {[
-              {
-                step: "01",
-                title: "Install and connect",
-                body: "Install Unlink and grant screen time permissions. It takes 90 seconds. That is it.",
-              },
-              {
-                step: "02",
-                title: "Set your rules",
-                body: "Choose which apps to block, set daily time limits, and configure scroll lock thresholds. Use our starter preset if you do not know where to begin.",
-              },
-              {
-                step: "03",
-                title: "Let it hold you",
-                body: "Unlink enforces your rules even when you want to bend them. Especially then. You will feel the friction. That is the point.",
-              },
+              { step: "01", title: "Install and grant permissions", body: "Install Unlink, grant screen time and accessibility permissions. It takes 90 seconds. No account creation. No Google sign-in. Nothing leaves your phone." },
+              { step: "02", title: "Choose what to block", body: "Pick the apps that trap you. Set Surgical Mode to kill only Reels inside YouTube and Instagram while keeping the rest. Or go full block. Add a schedule if you want it automatic." },
+              { step: "03", title: "Let it hold you accountable", body: "Unlink enforces your rules even when you want to bend them. The Intent Gate will ask why you are opening an app. Strict Mode makes it tamper-proof. Mom Test adds human accountability." },
             ].map((item) => (
               <div key={item.step}>
-                <span
-                  className="block text-7xl font-bold text-[var(--brand-border)] leading-none mb-4"
-                  style={{ fontFamily: "var(--font-display)" }}
-                  aria-hidden="true"
-                >
-                  {item.step}
-                </span>
-                <h3
-                  className="text-xl font-semibold text-[var(--brand-dark)] mb-3"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  {item.title}
-                </h3>
+                <span className="block text-7xl font-bold text-[var(--brand-border)] leading-none mb-4" style={{ fontFamily: "var(--font-display)" }} aria-hidden="true">{item.step}</span>
+                <h3 className="text-xl font-semibold text-[var(--brand-dark)] mb-3" style={{ fontFamily: "var(--font-display)" }}>{item.title}</h3>
                 <p className="text-[#555] text-sm leading-relaxed">{item.body}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-16 rounded-2xl overflow-hidden border border-[var(--brand-border)]">
-            <img
-              src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1200&q=80"
-              alt="Unlink app interface showing blocking settings on a phone"
-              className="w-full h-64 md:h-96 object-cover"
-            />
+          <div className="flex flex-col md:flex-row gap-8 items-center justify-center">
+            <BlockingMockup />
+            <IntentGateMockup />
           </div>
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section
-        id="testimonials"
-        className="py-24 px-5 border-b border-[var(--brand-border)]"
-        aria-labelledby="testimonials-heading"
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="max-w-xl mb-14">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#888] mb-4">People who quit the scroll</p>
-            <h2
-              id="testimonials-heading"
-              className="text-4xl md:text-5xl font-bold text-[var(--brand-dark)] leading-tight"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              It works. Here is proof.
+      {/* OPEN SOURCE */}
+      <section id="open-source" className="bg-[var(--brand-dark)] text-white py-20 px-5 border-b border-[#111]" aria-labelledby="oss-heading">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#555] mb-4">Transparent by design</p>
+              <h2 id="oss-heading" className="text-3xl md:text-4xl font-bold leading-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
+                Read the code.<br />Trust the code.
+              </h2>
+              <p className="text-[#888] text-base leading-relaxed max-w-md mb-6">
+                Unlink is fully open source. Every line the Accessibility Service runs is public. No hidden data collection. No trackers. No ads. You do not have to take our word for it.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-[var(--brand-dark)] font-semibold px-6 py-3 rounded-full hover:bg-[#ddd] transition-colors text-sm"
+                >
+                  <Github size={16} aria-hidden /> View on GitHub
+                </a>
+                <a
+                  href={WHATSAPP_GROUP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 border border-[#333] text-[#888] hover:text-white hover:border-[#555] font-medium px-6 py-3 rounded-full transition-colors text-sm"
+                >
+                  <WhatsAppIcon size={14} /> Join WhatsApp
+                </a>
+              </div>
+            </div>
+            <div className="border border-[#1a1a1a] rounded-2xl p-6 bg-[#0a0a0a] min-w-64">
+              <p className="text-[#444] text-xs uppercase tracking-widest mb-3">Built by</p>
+              <p className="text-white font-bold text-lg mb-1" style={{ fontFamily: "var(--font-display)" }}>Shahil KV</p>
+              <p className="text-[#555] text-sm mb-4">Founder, Unlink</p>
+              <div className="space-y-2 text-sm">
+                <a href={WHATSAPP_GROUP_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
+                  <span className="text-[#333]">→</span> WhatsApp Community
+                </a>
+                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
+                  <span className="text-[#333]">→</span> GitHub: UnlinkHq
+                </a>
+                <a href="mailto:mshahilkv@gmail.com" className="flex items-center gap-2 text-[#666] hover:text-white transition-colors">
+                  <span className="text-[#333]">→</span> mshahilkv@gmail.com
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="py-24 px-5 border-b border-[var(--brand-border)]" aria-labelledby="faq-heading">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-12">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#888] mb-4">Questions</p>
+            <h2 id="faq-heading" className="text-4xl md:text-5xl font-bold text-[var(--brand-dark)] leading-tight" style={{ fontFamily: "var(--font-display)" }}>
+              Everything you want to know.
             </h2>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t) => (
-              <div
-                key={t.name}
-                className="border border-[var(--brand-border)] rounded-xl p-6 bg-[var(--brand-surface)] hover:border-[var(--brand-dark)] transition-colors duration-200"
-              >
-                <div className="flex gap-0.5 mb-4" aria-label="5 out of 5 stars">
-                  {Array(5).fill(null).map((_, i) => (
-                    <Star key={i} size={14} className="fill-[var(--brand-dark)] text-[var(--brand-dark)]" aria-hidden="true" />
-                  ))}
-                </div>
-                <p className="text-[#333] text-sm leading-relaxed mb-6 italic">&ldquo;{t.quote}&rdquo;</p>
-                <div className="flex items-center gap-3">
-                  <img
-                    src={t.avatar}
-                    alt={t.name}
-                    width={40}
-                    height={40}
-                    className="rounded-full border border-[var(--brand-border)]"
-                  />
-                  <div>
-                    <p className="font-semibold text-sm text-[var(--brand-dark)]">{t.name}</p>
-                    <p className="text-xs text-[#888]">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div>
+            {faqs.map((faq) => <FAQItem key={faq.q} {...faq} />)}
           </div>
+          <p className="mt-8 text-sm text-[#888]">
+            Still have questions?{" "}
+            <a href={WHATSAPP_GROUP_URL} target="_blank" rel="noopener noreferrer" className="text-[var(--brand-dark)] underline hover:text-[var(--brand-accent)] transition-colors">
+              Ask in the WhatsApp group.
+            </a>
+          </p>
         </div>
       </section>
 
-      {/* DOWNLOAD / WAITLIST CTA */}
-      <section
-        id="waitlist"
-        className="py-24 px-5 bg-[var(--brand-dark)] text-white"
-        aria-labelledby="cta-heading"
-      >
-        <div className="max-w-2xl mx-auto text-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#555] mb-6">Early access</p>
-          <h2
-            id="cta-heading"
-            className="text-4xl md:text-6xl font-bold leading-tight mb-6"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
+      {/* WAITLIST */}
+      <section id="waitlist" className="py-24 px-5 bg-[var(--brand-dark)] text-white" aria-labelledby="cta-heading">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-[#555] mb-6">Early access — Android</p>
+          <h2 id="cta-heading" className="text-4xl md:text-6xl font-bold leading-tight mb-6" style={{ fontFamily: "var(--font-display)" }}>
             Stop reading about it.
             <span className="block text-[#555]">Start fixing it.</span>
           </h2>
-          <p className="text-[#777] text-base mb-10 max-w-md mx-auto leading-relaxed">
-            Join the waitlist. We are rolling out access to people serious about breaking the habit — not just curious about it.
+          <p className="text-[#777] text-base mb-12 max-w-md mx-auto leading-relaxed">
+            Pick how you want in. Get notified by email or join the community on WhatsApp.
           </p>
 
-          {emailSubmitted ? (
-            <div className="border border-[#333] rounded-xl px-8 py-6 inline-block">
-              <p className="text-white font-semibold text-lg" style={{ fontFamily: "var(--font-display)" }}>
-                You are on the list.
-              </p>
-              <p className="text-[#666] text-sm mt-1">We will reach out when your spot opens.</p>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleEmailSubmit}
-              className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto"
-              aria-label="Waitlist signup form"
-            >
-              <label htmlFor="waitlist-email" className="sr-only">Email address</label>
-              <input
-                id="waitlist-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="your@email.com"
-                className="flex-1 bg-[#111] border border-[#333] text-white text-sm px-4 py-3 rounded-full placeholder:text-[#555] focus:outline-none focus:border-[#666] transition-colors"
-              />
-              <button
-                type="submit"
-                className="bg-white text-[var(--brand-dark)] text-sm font-semibold px-6 py-3 rounded-full hover:bg-[#ddd] transition-colors duration-200 whitespace-nowrap"
-              >
-                Get Early Access
-              </button>
-            </form>
-          )}
+          {/* Two-option cards */}
+          <div className="grid md:grid-cols-[1fr_auto_1fr] gap-6 items-stretch">
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
-            <button
-              disabled
-              aria-label="Download on the App Store (coming soon)"
-              className="flex items-center gap-3 border border-[#333] rounded-xl px-5 py-3 opacity-50 cursor-not-allowed"
-            >
+            {/* Email option */}
+            <div className="border border-[#222] rounded-2xl p-7 bg-[#0a0a0a] flex flex-col">
+              <div className="mb-5 text-left">
+                <span className="inline-block bg-[#1a1a1a] text-[#888] text-[10px] uppercase tracking-widest px-3 py-1 rounded-full mb-4">Waitlist</span>
+                <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "var(--font-display)" }}>Get notified by email</h3>
+                <p className="text-sm text-[#666] leading-relaxed">
+                  Drop your email. When the app is live, we will let you know. No newsletter. No spam.
+                </p>
+              </div>
+              <div className="flex-1 flex flex-col justify-end">
+                {emailSubmitted ? (
+                  <div className="border border-[#1a1a1a] rounded-xl px-5 py-4 bg-[#111]">
+                    <p className="text-white font-semibold text-base" style={{ fontFamily: "var(--font-display)" }}>Email submitted.</p>
+                    <p className="text-[#555] text-sm mt-1">We will notify you when the app goes live.</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3" aria-label="Waitlist signup form">
+                    <label htmlFor="waitlist-email" className="sr-only">Email address</label>
+                    <input
+                      id="waitlist-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      placeholder="your@email.com"
+                      className="w-full bg-[#111] border border-[#2a2a2a] text-white text-sm px-4 py-3 rounded-xl placeholder:text-[#444] focus:outline-none focus:border-[#555] transition-colors"
+                    />
+                    <button
+                      type="submit"
+                      disabled={emailLoading}
+                      className="w-full bg-white text-[var(--brand-dark)] text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#e5e5e5] transition-colors duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {emailLoading ? (
+                        <span className="inline-block w-4 h-4 border-2 border-[#aaa] border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <>Get Early Access <ArrowRight size={14} aria-hidden /></>
+                      )}
+                    </button>
+                    {emailError && <p className="text-red-400 text-xs text-center">{emailError}</p>}
+                  </form>
+                )}
+              </div>
+            </div>
+
+            {/* OR divider */}
+            <div className="hidden md:flex flex-col items-center justify-center gap-3">
+              <div className="w-px flex-1 bg-[#1a1a1a]" />
+              <span className="text-[#333] text-xs uppercase tracking-widest font-medium px-1">or</span>
+              <div className="w-px flex-1 bg-[#1a1a1a]" />
+            </div>
+            <div className="flex md:hidden items-center gap-4">
+              <div className="flex-1 h-px bg-[#1a1a1a]" />
+              <span className="text-[#333] text-xs uppercase tracking-widest font-medium">or</span>
+              <div className="flex-1 h-px bg-[#1a1a1a]" />
+            </div>
+
+            {/* WhatsApp option */}
+            <div className="border border-[#1a2e1a] rounded-2xl p-7 bg-[#050f05] flex flex-col">
+              <div className="mb-5 text-left">
+                <span className="inline-flex items-center gap-1.5 bg-[#0d1f0d] text-[#4caf50] text-[10px] uppercase tracking-widest px-3 py-1 rounded-full mb-4">
+                  <WhatsAppIcon size={12} /> Community
+                </span>
+                <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "var(--font-display)" }}>Join on WhatsApp</h3>
+                <p className="text-sm text-[#666] leading-relaxed">
+                  Get early access, give feedback, and talk directly with the founder. Real conversations, not broadcasts.
+                </p>
+              </div>
+              <div className="flex-1 flex flex-col justify-end gap-3">
+                <div className="border border-[#1a2e1a] rounded-xl px-4 py-3 bg-[#0a1a0a]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#4caf50]" />
+                    <span className="text-[#4caf50] text-[10px] uppercase tracking-widest">Active group</span>
+                  </div>
+                  <p className="text-[#888] text-xs leading-relaxed">Unlink Early Access · Discuss features, report bugs, get the APK first.</p>
+                </div>
+                <a
+                  href={WHATSAPP_GROUP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-[#25d366] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#1dba57] transition-colors duration-200 flex items-center justify-center gap-2"
+                >
+                  <WhatsAppIcon size={16} /> Join WhatsApp Group
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Store buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-14">
+            <button disabled aria-label="Download on the App Store (coming soon)" className="flex items-center gap-3 border border-[#1a1a1a] rounded-xl px-5 py-3 opacity-40 cursor-not-allowed">
               <Apple size={22} aria-hidden="true" />
               <div className="text-left">
-                <p className="text-[10px] text-[#666] uppercase tracking-wider">Coming soon</p>
+                <p className="text-[10px] text-[#555] uppercase tracking-wider">Coming soon</p>
                 <p className="text-sm font-medium">App Store</p>
               </div>
             </button>
-            <button
-              disabled
-              aria-label="Get it on Google Play (coming soon)"
-              className="flex items-center gap-3 border border-[#333] rounded-xl px-5 py-3 opacity-50 cursor-not-allowed"
-            >
+            <button disabled aria-label="Get it on Google Play (coming soon)" className="flex items-center gap-3 border border-[#1a1a1a] rounded-xl px-5 py-3 opacity-40 cursor-not-allowed">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M3.18 23.76c.3.17.66.2 1.02.07l12.35-7.13-2.68-2.68-10.69 9.74zm-1.04-20.7A1.5 1.5 0 002 4.3v15.4a1.5 1.5 0 00.14.65l10.8-10.8-10.8-6.49zm19.13 8.44l-2.8-1.62-3.03 3.03 3.03 3.03 2.83-1.64a1.5 1.5 0 000-2.8zM4.2.17C3.84.04 3.48.07 3.18.24L13.87 10.9l2.68-2.68L4.2.17z" />
               </svg>
               <div className="text-left">
-                <p className="text-[10px] text-[#666] uppercase tracking-wider">Coming soon</p>
+                <p className="text-[10px] text-[#555] uppercase tracking-wider">Coming soon</p>
                 <p className="text-sm font-medium">Google Play</p>
               </div>
             </button>
@@ -615,37 +741,46 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer
-        className="bg-[var(--brand-dark)] border-t border-[#111] py-12 px-5"
-        role="contentinfo"
-      >
+      <footer className="bg-[var(--brand-dark)] border-t border-[#111] py-12 px-5" role="contentinfo">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-start justify-between gap-10 mb-10">
             <div>
-              <p
-                className="text-xl font-bold text-white mb-2"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                Unlink
+              <p className="text-xl font-bold text-white mb-2" style={{ fontFamily: "var(--font-display)" }}>Unlink</p>
+              <p className="text-[#555] text-sm max-w-xs leading-relaxed mb-4">
+                Surgical screen time control for Android. No login. No cloud. Open source.
               </p>
-              <p className="text-[#555] text-sm max-w-xs leading-relaxed">
-                Break the scroll. Reclaim your time. Built by people who got their attention back.
-              </p>
+              <div className="flex gap-3 items-center">
+                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="text-[#444] hover:text-white transition-colors" aria-label="GitHub">
+                  <Github size={18} />
+                </a>
+                <a href={WHATSAPP_GROUP_URL} target="_blank" rel="noopener noreferrer" className="text-[#444] hover:text-[#25d366] transition-colors" aria-label="WhatsApp Community">
+                  <WhatsAppIcon size={18} />
+                </a>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-x-16 gap-y-2 text-sm">
-              {["Features", "How It Works", "Testimonials", "Privacy Policy", "Terms of Use", "Contact"].map((link) => (
-                <a
-                  key={link}
-                  href="#"
-                  className="text-[#555] hover:text-white transition-colors duration-200"
-                >
-                  {link}
-                </a>
+              {[
+                { label: "Features", href: "#features" },
+                { label: "How It Works", href: "#how-it-works" },
+                { label: "FAQ", href: "#faq" },
+                { label: "Open Source", href: "https://github.com/UnlinkHq/Application" },
+                { label: "Privacy Policy", href: "/privacy" },
+                { label: "WhatsApp", href: WHATSAPP_GROUP_URL },
+              ].map(({ label, href }) => (
+                href.startsWith("http") || href.startsWith("https") ? (
+                  <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="text-[#555] hover:text-white transition-colors duration-200">
+                    {label}
+                  </a>
+                ) : (
+                  <Link key={label} href={href} className="text-[#555] hover:text-white transition-colors duration-200">
+                    {label}
+                  </Link>
+                )
               ))}
             </div>
           </div>
           <div className="border-t border-[#1a1a1a] pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <p className="text-[#444] text-xs">2026 Unlink. All rights reserved.</p>
+            <p className="text-[#444] text-xs">© 2025 Unlink. Built by Shahil KV.</p>
             <p className="text-[#333] text-xs">Your attention is yours. Reclaim it.</p>
           </div>
         </div>
